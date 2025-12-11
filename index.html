@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Порядок чисел — Авторизация</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body class="page page--auth">
+  <header class="topbar">
+    <a href="index.html" class="logo">Порядок чисел</a>
+    <nav class="nav">
+      <a class="nav__link nav__link--active" href="index.html">Главная</a>
+      <a class="nav__link" id="playLink" href="#">Играть</a>
+      <a class="nav__link" href="rating.html">Рейтинг</a>
+    </nav>
+  </header>
+
+  <main class="main">
+    <section class="hero card card--center">
+      <div class="card__header">
+        <h1>Давайте познакомимся</h1>
+        <p class="text-muted">Мини-авторизация перед стартом игры</p>
+      </div>
+      <div class="hero__body">
+        <div class="form-group">
+          <label for="playerName">Ваше имя</label>
+          <input type="text" id="playerName" name="playerName" maxlength="15" placeholder="Введите ваше имя" autocomplete="name">
+          <p class="input-hint">2–15 символов, только буквы/цифры</p>
+          <p class="input-error" id="nameError"></p>
+        </div>
+        <div class="actions">
+          <button type="button" class="btn btn--primary" id="startGameBtn">Начать игру</button>
+          <button class="btn btn--ghost" id="continueBtn" hidden>Продолжить как <span id="continueName"></span></button>
+        </div>
+        <div class="links-row">
+          <button class="link-btn" id="openRulesBtn">Правила</button>
+          <a class="link-btn" href="rating.html">Перейти к рейтингу</a>
+        </div>
+        <p class="text-muted hero__description">
+          «Порядок чисел» — логическая игра, где нужно выбирать числа по правилам,
+          ловить последовательности и собирать выражения. Каждое прохождение уникально.
+        </p>
+      </div>
+    </section>
+  </main>
+
+  <div class="modal" id="rulesModal" aria-hidden="true">
+    <div class="modal__overlay" id="rulesOverlay"></div>
+    <div class="modal__content card card--floating">
+      <header class="card__header">
+        <h2>Правила игры</h2>
+        <button class="icon-btn" id="closeRulesBtn" aria-label="Закрыть">×</button>
+      </header>
+      <div class="modal__body">
+        <ul class="list">
+          <li><strong>Структура игры:</strong> 3 уровня, на каждом уровне по 3 подуровня. Проходите уровни последовательно (1 → 2 → 3).</li>
+          <li><strong>Уровень 1 — Статическая сетка:</strong> Выбирайте числа из сетки по правилам (четные, кратные, простые, арифметическая прогрессия). Направление сортировки (возрастание/убывание) выбирается случайно. Двойной клик по иконке «?» покажет подсказку правила.</li>
+          <li><strong>Уровень 2 — Падающие числа:</strong> Кликайте по падающим числам в правильном порядке (геометрическая прогрессия, подряд идущие числа, кратные числа). Все нужные числа гарантированно появятся.</li>
+          <li><strong>Уровень 3 — Арифметические выражения:</strong> Перетаскивайте числа и операции в слоты для составления выражения. Учитывается порядок операций (умножение/деление перед сложением/вычитанием). Клик по слоту или перетаскивание возвращает элемент обратно.</li>
+          <li><strong>Сложность:</strong> Легкий (числа до 60), Средний (до 100), Сложный (до 150). Влияет на время, скорость анимаций и множитель очков.</li>
+          <li><strong>Очки:</strong> Зависят от сложности, скорости выполнения и отсутствия ошибок. Есть бонус за оставшееся время и штраф за ошибки.</li>
+          <li><strong>Результаты:</strong> Сохраняются автоматически и попадают в таблицу рейтинга. Можно очистить все данные на странице рейтинга.</li>
+        </ul>
+      </div>
+      <footer class="modal__footer">
+        <button class="btn" id="closeRulesFooterBtn">Понятно</button>
+      </footer>
+    </div>
+  </div>
+
+  <script src="js/storage.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/auth.js"></script>
+</body>
+</html>
+

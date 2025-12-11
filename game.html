@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Порядок чисел — Игра</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body class="page page--game">
+  <header class="topbar">
+    <a href="index.html" class="logo">Порядок чисел</a>
+    <nav class="nav">
+      <a class="nav__link" href="index.html">Главная</a>
+      <a class="nav__link nav__link--active" href="game.html">Играть</a>
+      <a class="nav__link" href="rating.html">Рейтинг</a>
+    </nav>
+  </header>
+
+  <main class="main main--wide">
+    <section class="hud card">
+      <div class="hud__group">
+        <span class="label">Игрок:</span>
+        <span id="hudPlayer" class="pill pill--primary">---</span>
+      </div>
+      <div class="hud__group">
+        <span class="label">Сложность:</span>
+        <span id="hudDifficulty" class="pill">—</span>
+      </div>
+      <div class="hud__group">
+        <span class="label">Уровень:</span>
+        <span id="hudLevel" class="pill">1</span>
+      </div>
+      <div class="hud__group">
+        <span class="label">Подуровень:</span>
+        <span id="hudSublevel" class="pill pill--muted">1</span>
+      </div>
+      <div class="hud__group">
+        <span class="label">Очки:</span>
+        <span id="hudScore" class="pill pill--accent">0</span>
+      </div>
+      <div class="hud__group">
+        <span class="label">Время:</span>
+        <span id="hudTimer" class="pill pill--dark">00:00</span>
+      </div>
+      <div class="hud__actions">
+        <button type="button" id="exitBtn" class="btn btn--ghost">Выйти в меню</button>
+        <button type="button" id="finishBtn" class="btn btn--outline">Завершить игру</button>
+      </div>
+    </section>
+
+    <section class="card card--stacked">
+      <header class="card__header">
+        <div>
+          <p class="eyebrow">Выбор сложности</p>
+          <h2>Привет, <span id="playerNameTitle">игрок</span>! Выберите уровень сложности:</h2>
+        </div>
+      </header>
+      <div class="difficulty-grid" id="difficultyPanel">
+        <button class="difficulty-card" data-diff="easy">
+          <h3>Легкий</h3>
+          <p>Щадящее время, медленные анимации, множитель ×1</p>
+        </button>
+        <button class="difficulty-card" data-diff="medium">
+          <h3>Средний</h3>
+          <p>Сбалансированное время, анимации быстрее, множитель ×1.5</p>
+        </button>
+        <button class="difficulty-card" data-diff="hard">
+          <h3>Сложный</h3>
+          <p>Мало времени, все быстро движется, множитель ×2</p>
+        </button>
+      </div>
+    </section>
+
+    <section class="card card--stacked" id="devToolsSection">
+      <header class="card__header">
+        <div>
+          <p class="eyebrow">Режим проверки</p>
+          <h3>Перейти к уровню</h3>
+        </div>
+      </header>
+      <div class="dev-tools">
+        <label for="devSkipSelect">Выберите уровень:</label>
+        <select id="devSkipSelect">
+          <option value="1">1</option>
+          <option value="2">2</option>
+          <option value="3">3</option>
+        </select>
+        <small class="text-muted">Использовать только для теста, обходя ограничения</small>
+      </div>
+    </section>
+
+    <section class="card card--stacked">
+      <header class="card__header">
+        <div>
+          <p class="eyebrow">Игровая область</p>
+          <h2 id="ruleTitle">Сначала выберите сложность, чтобы начать</h2>
+        </div>
+        <div class="hint">
+          <button class="icon-btn" id="hintBtn" title="Дважды кликните для подсказки">?</button>
+        </div>
+      </header>
+      <div id="gameArea" class="game-area">
+        <div class="placeholder">Здесь появятся задания после выбора сложности</div>
+      </div>
+      <footer class="card__footer">
+        <div id="messages" class="messages"></div>
+      </footer>
+    </section>
+  </main>
+
+  <script src="js/storage.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/game.js"></script>
+</body>
+</html>
+
