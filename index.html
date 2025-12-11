@@ -5,28 +5,31 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Порядок чисел — Авторизация</title>
   <link rel="stylesheet" href="css/styles.css">
+  <style>
+    body.page--auth {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+    }
+    body.page--auth .main {
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+  </style>
 </head>
 <body class="page page--auth">
-  <header class="topbar">
-    <a href="index.html" class="logo">Порядок чисел</a>
-    <nav class="nav">
-      <a class="nav__link nav__link--active" href="index.html">Главная</a>
-      <a class="nav__link" id="playLink" href="#">Играть</a>
-      <a class="nav__link" href="rating.html">Рейтинг</a>
-    </nav>
-  </header>
-
   <main class="main">
     <section class="hero card card--center">
       <div class="card__header">
-        <h1>Давайте познакомимся</h1>
-        <p class="text-muted">Мини-авторизация перед стартом игры</p>
+        <h1 style="text-align: center;">Давайте познакомимся</h1>
       </div>
       <div class="hero__body">
         <div class="form-group">
-          <label for="playerName">Ваше имя</label>
           <input type="text" id="playerName" name="playerName" maxlength="15" placeholder="Введите ваше имя" autocomplete="name">
-          <p class="input-hint">2–15 символов, только буквы/цифры</p>
           <p class="input-error" id="nameError"></p>
         </div>
         <div class="actions">

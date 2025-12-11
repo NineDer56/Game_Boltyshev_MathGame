@@ -106,7 +106,7 @@ function init() {
   
   renderRating(applySort(Storage.getRating()));
   renderCurrentPlayer();
-  playAgainBtn.addEventListener('click', () => window.location.href = 'index.html');
+  playAgainBtn.addEventListener('click', () => window.location.href = 'game.html');
   clearBtn.addEventListener('click', () => {
     if (confirm('Точно очистить рейтинг?')) {
       Storage.clearRating();
