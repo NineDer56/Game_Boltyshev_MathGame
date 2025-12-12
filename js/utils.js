@@ -1,4 +1,3 @@
-// Утилиты
 const Utils = {
   randomInt: function(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
@@ -12,7 +11,6 @@ const Utils = {
     return arr;
   },
   formatTime: function(seconds) {
-    // Обрабатываем отрицательные значения
     const safeSeconds = Math.max(0, Math.floor(seconds));
     const m = String(Math.floor(safeSeconds / 60)).padStart(2, '0');
     const s = String(safeSeconds % 60).padStart(2, '0');

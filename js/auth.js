@@ -1,5 +1,3 @@
-// auth.js - авторизация игрока
-
 let nameInput;
 let nameError;
 let startBtn;
@@ -24,7 +22,6 @@ function validateName(value) {
   if (value.trim().length < 2) return 'Минимум 2 символа';
   if (value.trim().length > 15) return 'Не больше 15 символов';
   const trimmed = value.trim();
-  // Браузерно-безопасная проверка без \p{} для старых движков
   const simplePattern = /^[A-Za-z0-9А-Яа-яЁё\s]+$/;
   if (!simplePattern.test(trimmed)) return 'Только буквы или цифры';
   return '';

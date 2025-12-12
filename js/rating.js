@@ -1,5 +1,3 @@
-// rating.js - страница рейтинга
-
 const ratingBody = document.getElementById('ratingTableBody');
 const currentPlayerBlock = document.getElementById('currentPlayerResult');
 const playAgainBtn = document.getElementById('playAgainBtn');
@@ -22,7 +20,6 @@ function renderRating(list) {
   }
   list.forEach((item, index) => {
     const row = document.createElement('tr');
-    // Безопасное создание ячеек без innerHTML
     const cells = [
       String(index + 1),
       String(item.name || ''),
@@ -64,7 +61,6 @@ function renderCurrentPlayer() {
   const records = Storage.getPlayerRecords(name);
   const best = records.length ? Math.max(...records.map((r) => r.score)) : last.score;
   
-  // Безопасное создание элементов без innerHTML
   currentPlayerBlock.innerHTML = '';
   const nameP = document.createElement('p');
   const nameStrong = document.createElement('strong');
@@ -98,7 +94,6 @@ function handleSort(evt) {
 }
 
 function init() {
-  // Проверка наличия необходимых элементов
   if (!ratingBody || !currentPlayerBlock || !playAgainBtn || !clearBtn || !tableHead) {
     console.error('Не найдены необходимые элементы на странице рейтинга');
     return;

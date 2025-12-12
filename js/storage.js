@@ -1,4 +1,3 @@
-// Хелперы для безопасной работы с localStorage
 const Storage = (function() {
   const STORAGE_KEYS = {
     currentPlayerName: 'currentPlayerName',
@@ -36,21 +35,18 @@ const Storage = (function() {
     getRating: function() {
       const raw = localStorage.getItem(STORAGE_KEYS.rating);
       const parsed = safeParse(raw, []);
-      // Убеждаемся, что всегда возвращаем массив
       return Array.isArray(parsed) ? parsed : [];
     },
     saveRating: function(list) {
       try {
         const data = JSON.stringify(list);
-        // Проверка размера (примерно, localStorage обычно 5-10MB)
-        if (data.length > 1000000) { // 1MB
+        if (data.length > 1000000) {
           console.warn('Размер рейтинга слишком большой, возможно превышение лимита');
         }
         localStorage.setItem(STORAGE_KEYS.rating, data);
       } catch (e) {
         if (e.name === 'QuotaExceededError') {
           console.error('Превышен лимит localStorage, невозможно сохранить рейтинг');
-          // Можно попробовать удалить старые записи
         } else {
           console.error('Ошибка сохранения рейтинга:', e);
         }
@@ -59,13 +55,11 @@ const Storage = (function() {
     },
     addRatingRecord: function(record) {
       const list = Storage.getRating();
-      // Дополнительная проверка на случай, если getRating вернул не массив
       if (!Array.isArray(list)) {
         console.warn('getRating вернул не массив, инициализируем пустым массивом');
         Storage.saveRating([]);
-        return Storage.addRatingRecord(record); // Рекурсивный вызов с исправленными данными
+        return Storage.addRatingRecord(record);
       }
-      // Обновляем рекорд игрока, если новый результат лучше
       const existingIndex = list.findIndex((item) => item && item.name === record.name);
       if (existingIndex >= 0) {
         if (record.score > list[existingIndex].score) {
@@ -91,7 +85,6 @@ const Storage = (function() {
       return Storage.getRating().filter((entry) => entry.name === name);
     },
     clearAllData: function() {
-      // Очищаем все данные игры
       localStorage.removeItem(STORAGE_KEYS.currentPlayerName);
       localStorage.removeItem(STORAGE_KEYS.rating);
       localStorage.removeItem(STORAGE_KEYS.lastResult);
