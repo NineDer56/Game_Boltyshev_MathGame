@@ -43,6 +43,9 @@ const state = {
   expectedIndex: 0,
   allowLevels: 1,
   currentRuleHint: '',
+  platform: null,
+  platformPosition: 50,
+  keys: { left: false, right: false },
 };
 
 function resetTimers() {
@@ -52,6 +55,10 @@ function resetTimers() {
   state.timerId = null;
   state.spawnId = null;
   state.collisionId = null;
+  state.platform = null;
+  state.platformPosition = 50;
+  state.keys.left = false;
+  state.keys.right = false;
 }
 
 function setMessage(text, type = 'info') {
@@ -157,8 +164,12 @@ function guardPlayer() {
     return;
   }
   state.player = player;
-  elements.playerNameTitle.textContent = player;
-  hud.player.textContent = player;
+  if (elements.playerNameTitle) {
+    elements.playerNameTitle.textContent = player;
+  }
+  if (hud.player) {
+    hud.player.textContent = player;
+  }
 }
 
 function generateLevel1Task() {
@@ -312,7 +323,9 @@ function renderLevel1() {
   state.expectedSequence = task.sequence;
   state.expectedIndex = 0;
   state.currentRuleHint = task.ruleText;
-  elements.ruleTitle.textContent = task.ruleText;
+  if (elements.ruleTitle) {
+    elements.ruleTitle.textContent = task.ruleText;
+  }
 
   clearArea();
   const grid = Utils.createEl('div', 'grid');
@@ -433,21 +446,80 @@ function generateLevel2Task() {
   const rule = rules[Utils.randomInt(0, rules.length - 1)];
   const result = rule.make();
   const text = result.text || rule.text;
-  return { ruleText: text, numbers: Utils.shuffle(result.numbers), sequence: result.sequence };
+  return { ruleText: text, numbers: result.numbers, sequence: result.sequence };
+}
+
+function findFreePosition(area, minDistance = 18) {
+  const existingNumbers = area.querySelectorAll('.falling-number');
+  const occupiedPositions = [];
+  
+  existingNumbers.forEach(num => {
+    const leftPercent = parseFloat(num.style.left);
+    if (!isNaN(leftPercent)) {
+      occupiedPositions.push(leftPercent);
+    }
+  });
+  
+  if (occupiedPositions.length === 0) {
+    return Utils.randomInt(2, 88);
+  }
+  
+  const maxAttempts = 50;
+  for (let attempt = 0; attempt < maxAttempts; attempt++) {
+    const candidate = Utils.randomInt(2, 88);
+    let isFree = true;
+    
+    for (const occupied of occupiedPositions) {
+      if (Math.abs(candidate - occupied) < minDistance) {
+        isFree = false;
+        break;
+      }
+    }
+    
+    if (isFree) {
+      return candidate;
+    }
+  }
+  
+  let bestPosition = 2;
+  let maxMinDistance = 0;
+  
+  for (let pos = 2; pos <= 88; pos += 2) {
+    let minDistanceToOthers = Infinity;
+    for (const occupied of occupiedPositions) {
+      const distance = Math.abs(pos - occupied);
+      if (distance < minDistanceToOthers) {
+        minDistanceToOthers = distance;
+      }
+    }
+    if (minDistanceToOthers > maxMinDistance) {
+      maxMinDistance = minDistanceToOthers;
+      bestPosition = pos;
+    }
+  }
+  
+  return bestPosition;
 }
 
 function spawnFallingNumber(area, value, needed) {
   const node = Utils.createEl('div', 'falling-number', value);
   const diff = difficulties[state.difficulty] || difficulties.easy;
-  const duration = Utils.clamp(diff.fallDuration - state.level * 0.5, 3.8, diff.fallDuration);
-  node.style.left = `${Utils.randomInt(2, 88)}%`;
-  node.style.animationDuration = `${duration}s`;
+  const baseDuration = Utils.clamp(diff.fallDuration - state.level * 0.5, 3.8, diff.fallDuration);
+  
+  const speedVariation = 1 + (Math.random() * 0.6 - 0.3); 
+  const duration = baseDuration * speedVariation;
+  
+  const minDuration = Math.max(2.5, baseDuration * 0.7);
+  const maxDuration = Math.min(12, baseDuration * 1.3);
+  const finalDuration = Utils.clamp(duration, minDuration, maxDuration);
+  
+  const leftPosition = findFreePosition(area, 18);
+  
+  node.style.left = `${leftPosition}%`;
+  node.style.animationDuration = `${finalDuration}s`;
   node.dataset.value = value;
   node.dataset.needed = needed ? '1' : '0';
   node.dataset.expectedValue = state.expectedSequence[state.expectedIndex] || '';
-  node.addEventListener('click', () => {
-    handleFallingHit(node);
-  });
   node.addEventListener('animationend', () => {
     if (node.dataset.needed === '1' && node.dataset.expectedValue === String(value)) {
       setMessage('Упущено нужное число', 'error');
@@ -465,7 +537,8 @@ function handleFallingHit(node) {
   const value = Number(node.dataset.value);
   const expectedValue = state.expectedSequence[state.expectedIndex];
   if (expectedValue === value) {
-    node.remove();
+    moveNumberToAnswersRow(node, value, state.expectedIndex);
+    
     state.expectedIndex += 1;
     addScore(BASE_POINTS / 2);
     if (state.expectedIndex === state.expectedSequence.length) {
@@ -488,16 +561,157 @@ function handleFallingHit(node) {
   }
 }
 
+function createPlatform(area) {
+  const platform = Utils.createEl('div', 'platform');
+  platform.style.left = `${state.platformPosition}%`;
+  area.appendChild(platform);
+  state.platform = platform;
+  return platform;
+}
+
+function handleKeyDown(e) {
+  if (state.level !== 2 || !state.platform) return;
+  
+  if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') {
+    e.preventDefault();
+    state.keys.left = true;
+  }
+  if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') {
+    e.preventDefault();
+    state.keys.right = true;
+  }
+}
+
+function handleKeyUp(e) {
+  if (state.level !== 2 || !state.platform) return;
+  
+  if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') {
+    e.preventDefault();
+    state.keys.left = false;
+  }
+  if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') {
+    e.preventDefault();
+    state.keys.right = false;
+  }
+}
+
+function updatePlatform() {
+  if (!state.platform || state.level !== 2) return;
+  
+  const speed = 2;
+  if (state.keys.left) {
+    state.platformPosition = Math.max(5, state.platformPosition - speed);
+  }
+  if (state.keys.right) {
+    state.platformPosition = Math.min(95, state.platformPosition + speed);
+  }
+  
+  state.platform.style.left = `${state.platformPosition}%`;
+}
+
+function checkCollisions(area) {
+  if (!state.platform || state.level !== 2) return;
+  
+  const platformRect = state.platform.getBoundingClientRect();
+  const fallingNumbers = area.querySelectorAll('.falling-number:not([data-processed="1"])');
+  
+  fallingNumbers.forEach(node => {
+    const nodeRect = node.getBoundingClientRect();
+    
+    if (
+      nodeRect.bottom >= platformRect.top &&
+      nodeRect.top <= platformRect.bottom &&
+      nodeRect.right >= platformRect.left &&
+      nodeRect.left <= platformRect.right
+    ) {
+      handleFallingHit(node);
+    }
+  });
+}
+
+function moveNumberToAnswersRow(node, value, index) {
+  const answersRow = elements.gameArea.querySelector('.answers-row');
+  if (!answersRow) return;
+  
+  const answerSlot = answersRow.querySelector(`[data-index="${index}"]`);
+  if (!answerSlot) return;
+  
+  if (!node.parentNode) return;
+  
+  const nodeRect = node.getBoundingClientRect();
+  const slotRect = answerSlot.getBoundingClientRect();
+  
+  const deltaX = slotRect.left + slotRect.width / 2 - (nodeRect.left + nodeRect.width / 2);
+  const deltaY = slotRect.top + slotRect.height / 2 - (nodeRect.top + nodeRect.height / 2);
+  
+  const clone = node.cloneNode(true);
+  clone.style.position = 'fixed';
+  clone.style.left = `${nodeRect.left}px`;
+  clone.style.top = `${nodeRect.top}px`;
+  clone.style.width = `${nodeRect.width}px`;
+  clone.style.height = `${nodeRect.height}px`;
+  clone.style.zIndex = '1000';
+  clone.style.pointerEvents = 'none';
+  clone.style.animation = 'none';
+  clone.style.transition = 'all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)';
+  document.body.appendChild(clone);
+  
+  node.remove();
+  
+  requestAnimationFrame(() => {
+    clone.style.transform = `translate(${deltaX}px, ${deltaY}px) scale(0.9)`;
+    clone.style.opacity = '0.9';
+  });
+  
+  setTimeout(() => {
+    answerSlot.textContent = value;
+    answerSlot.classList.add('filled');
+    clone.remove();
+  }, 500);
+}
+
 function renderLevel2() {
   const task = generateLevel2Task();
   state.expectedSequence = task.sequence;
   state.expectedIndex = 0;
   state.currentRuleHint = task.ruleText;
-  elements.ruleTitle.textContent = task.ruleText;
+  if (elements.ruleTitle) {
+    elements.ruleTitle.textContent = task.ruleText;
+  }
   clearArea();
+
+  const answersRow = Utils.createEl('div', 'answers-row visible');
+  for (let i = 0; i < task.sequence.length; i++) {
+    const answerSlot = Utils.createEl('div', 'answer-slot', '');
+    answerSlot.dataset.index = i;
+    answersRow.appendChild(answerSlot);
+  }
+  elements.gameArea.appendChild(answersRow);
 
   const area = Utils.createEl('div', 'falling-area');
   elements.gameArea.appendChild(area);
+
+  createPlatform(area);
+  state.platformPosition = 50;
+
+  document.addEventListener('keydown', handleKeyDown);
+  document.addEventListener('keyup', handleKeyUp);
+
+  elements.gameArea.cleanup = () => {
+    document.removeEventListener('keydown', handleKeyDown);
+    document.removeEventListener('keyup', handleKeyUp);
+    if (state.collisionId) {
+      clearInterval(state.collisionId);
+      state.collisionId = null;
+    }
+  };
+
+  const gameLoop = () => {
+    if (state.level !== 2 || !state.platform) return;
+    updatePlatform();
+    checkCollisions(area);
+  };
+  state.collisionId = setInterval(gameLoop, 16);
 
   const spawnedNeeded = new Set();
   let spawnCount = 0;
@@ -620,6 +834,11 @@ function evaluateExpression(num1, op1, num2, op2, num3) {
       if (num3 === 0) return null;
       result = step1 / num3;
     }
+  }
+  
+  if (result === undefined || isNaN(result)) {
+    console.error('Ошибка вычисления выражения:', num1, op1, num2, op2, num3);
+    return null;
   }
   
   return Math.round(result * 100) / 100;
@@ -773,7 +992,9 @@ function generateExpressionTask() {
 function renderLevel3() {
   const task = generateExpressionTask();
   state.currentRuleHint = 'Перетащите числа и операции в слоты, ПКМ — меню';
-  elements.ruleTitle.textContent = task.ruleText;
+  if (elements.ruleTitle) {
+    elements.ruleTitle.textContent = task.ruleText;
+  }
   clearArea();
 
   const numbersRow = Utils.createEl('div', 'grid');
@@ -851,7 +1072,10 @@ function renderLevel3() {
       if (card && card.classList.contains('disabled')) {
         slotElements.forEach(slot => {
           if (slot.dataset.cardId === data.id) {
-            slot.textContent = slotItems[slotElements.indexOf(slot)].label;
+            const slotIndex = slotElements.indexOf(slot);
+            if (slotIndex >= 0 && slotIndex < slotItems.length) {
+              slot.textContent = slotItems[slotIndex].label;
+            }
             delete slot.dataset.cardId;
             delete slot.dataset.value;
           }
@@ -972,7 +1196,15 @@ function renderLevel3() {
     const btn = e.target.closest('button');
     if (!btn) return;
     const slotIndex = Number(contextMenu.dataset.slotId);
+    if (isNaN(slotIndex) || slotIndex < 0 || slotIndex >= slotElements.length) {
+      contextMenu.classList.remove('open');
+      return;
+    }
     const slot = slotElements[slotIndex];
+    if (!slot) {
+      contextMenu.classList.remove('open');
+      return;
+    }
     if (btn.dataset.action === 'clear') {
       const cardId = slot.dataset.cardId;
       if (cardId) {
@@ -1068,11 +1300,15 @@ function selectDifficulty(diff) {
   state.level = 1;
   state.sublevel = 1;
   state.allowLevels = 1;
-  elements.ruleTitle.textContent = 'Приготовьтесь! Начинаем с уровня 1';
-  elements.difficultyPanel.classList.add('hidden');
-  const difficultyCard = elements.difficultyPanel.closest('.card');
-  if (difficultyCard) {
-    difficultyCard.classList.add('hidden');
+  if (elements.ruleTitle) {
+    elements.ruleTitle.textContent = 'Приготовьтесь! Начинаем с уровня 1';
+  }
+  if (elements.difficultyPanel) {
+    elements.difficultyPanel.classList.add('hidden');
+    const difficultyCard = elements.difficultyPanel.closest('.card');
+    if (difficultyCard) {
+      difficultyCard.classList.add('hidden');
+    }
   }
   setTimeout(() => startSublevel(1, 1), 500);
   updateHUD();

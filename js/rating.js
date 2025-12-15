@@ -40,18 +40,22 @@ function renderRating(list) {
 function applySort(list) {
   const sorted = [...list];
   const { field, dir } = currentSort;
+  if (field === 'index') {
+    return sorted;
+  }
   sorted.sort((a, b) => {
     if (field === 'score' || field === 'maxLevel') {
       return dir === 'asc' ? a[field] - b[field] : b[field] - a[field];
     }
     return dir === 'asc'
-      ? String(a[field]).localeCompare(String(b[field]))
-      : String(b[field]).localeCompare(String(a[field]));
+      ? String(a[field] || '').localeCompare(String(b[field] || ''))
+      : String(b[field] || '').localeCompare(String(a[field] || ''));
   });
   return sorted;
 }
 
 function renderCurrentPlayer() {
+  if (!currentPlayerBlock) return;
   const name = Storage.getCurrentPlayerName();
   const last = Storage.getLastResult();
   if (!name || !last) {

@@ -322,7 +322,6 @@ input[type="text"]:focus {
   z-index: 15;
 }
 
-/* HUD card должна быть поверх других карточек */
 section.hud.card {
   z-index: 10;
 }
@@ -507,7 +506,7 @@ select {
 .falling-area {
   position: relative;
   width: 100%;
-  height: 360px;
+  height: 550px;
   overflow: hidden;
   border-radius: 12px;
   background: linear-gradient(180deg, rgba(17, 24, 39, 0.9), rgba(17, 24, 39, 0.7));
@@ -529,13 +528,59 @@ select {
   animation-name: drop;
   animation-timing-function: linear;
   user-select: none;
+  pointer-events: none;
 }
 
-.falling-number:hover {
-  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.35);
+
+.platform {
+  position: absolute;
+  bottom: 20px;
+  width: 120px;
+  height: 20px;
+  background: linear-gradient(90deg, rgba(96, 165, 250, 0.8), rgba(147, 197, 253, 0.8));
+  border: 2px solid rgba(96, 165, 250, 1);
+  border-radius: 10px;
+  transform: translateX(-50%);
+  box-shadow: 0 4px 12px rgba(96, 165, 250, 0.4), 0 0 20px rgba(96, 165, 250, 0.3);
+  transition: left 0.1s linear;
+  z-index: 10;
 }
 
-/* Корзина удалена - теперь только клик по числам */
+.answers-row {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 16px;
+  min-height: 60px;
+  padding: 8px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px dashed var(--border);
+}
+
+.answer-slot {
+  min-width: 55px;
+  min-height: 55px;
+  border-radius: 10px;
+  border: 2px dashed var(--border);
+  display: grid;
+  place-items: center;
+  background: rgba(255, 255, 255, 0.03);
+  font-weight: 700;
+  font-size: 20px;
+  color: var(--muted);
+  transition: all 0.3s ease;
+}
+
+.answer-slot.filled {
+  background: rgba(52, 211, 153, 0.15);
+  border-color: rgba(52, 211, 153, 0.5);
+  border-style: solid;
+  color: #d1fae5;
+  transform: scale(1.05);
+  box-shadow: 0 8px 16px rgba(52, 211, 153, 0.2);
+}
 
 .slots {
   display: grid;
@@ -742,7 +787,7 @@ select {
 
 @keyframes drop {
   from { transform: translateY(-80px); opacity: 0.2; }
-  to { transform: translateY(420px); opacity: 1; }
+  to { transform: translateY(610px); opacity: 1; }
 }
 
 @media (max-width: 900px) {
