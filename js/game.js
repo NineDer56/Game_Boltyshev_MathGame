@@ -386,7 +386,7 @@ function generateLevel2Task() {
         return { 
           numbers: Utils.shuffle(allNumbers), 
           sequence: seq,
-          text: `Кликните числа геометрической прогрессии (знаменатель 2) по возрастанию, начиная с ${start}`
+          text: `Поймайте числа геометрической прогрессии (знаменатель 2) по возрастанию, начиная с ${start}`
         };
       },
     },
@@ -405,7 +405,7 @@ function generateLevel2Task() {
         return { 
           numbers: Utils.shuffle(allNumbers), 
           sequence: seq,
-          text: `Кликните подряд идущие числа по возрастанию, начиная с ${start}`
+          text: `Поймайте подряд идущие числа по возрастанию, начиная с ${start}`
         };
       },
     },
@@ -438,7 +438,7 @@ function generateLevel2Task() {
         return { 
           numbers: Utils.shuffle(allNumbers), 
           sequence: sortedSeq,
-          text: `Кликните числа, кратные ${multiplier}, в порядке ${direction}, начиная с ${firstNumber}`
+          text: `Поймайте числа, кратные ${multiplier}, в порядке ${direction}, начиная с ${firstNumber}`
         };
       },
     },
@@ -653,7 +653,7 @@ function moveNumberToAnswersRow(node, value, index) {
   clone.style.zIndex = '1000';
   clone.style.pointerEvents = 'none';
   clone.style.animation = 'none';
-  clone.style.transition = 'all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)';
+  clone.style.transition = 'all 1.5s cubic-bezier(0.34, 1.56, 0.64, 1)';
   document.body.appendChild(clone);
   
   node.remove();

@@ -129,8 +129,44 @@ function cacheDom() {
   closeRulesBtns = [document.getElementById('closeRulesBtn'), document.getElementById('closeRulesFooterBtn')];
 }
 
+function hideSplashScreen() {
+  const splashScreen = document.getElementById('splashScreen');
+  if (splashScreen) {
+    splashScreen.classList.add('hidden');
+    document.body.classList.remove('splash-active');
+    setTimeout(() => {
+      splashScreen.remove();
+    }, 600);
+  }
+}
+
+function initSplashScreen() {
+  const splashScreen = document.getElementById('splashScreen');
+  if (!splashScreen) return;
+
+  document.body.classList.add('splash-active');
+
+  splashScreen.addEventListener('click', hideSplashScreen);
+
+  let hideTimer = setTimeout(() => {
+    if (document.readyState === 'complete') {
+      hideSplashScreen();
+    }
+  }, 2500);
+
+  window.addEventListener('load', () => {
+    clearTimeout(hideTimer);
+    setTimeout(hideSplashScreen, 1000);
+  });
+
+  setTimeout(() => {
+    hideSplashScreen();
+  }, 4000);
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   try {
+    initSplashScreen();
     cacheDom();
     if (!startBtn || !nameInput) {
       console.error('Не найдены необходимые элементы на странице');
